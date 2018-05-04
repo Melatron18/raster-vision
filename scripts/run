@@ -6,28 +6,28 @@ if [[ -n "${RASTER_VISION_DEBUG}" ]]; then
     set -x
 fi
 
-PROJECT_ROOT="$(dirname "$(dirname "$(readlink -f "${0}")")")"
-SRC="$PROJECT_ROOT/src"
+#PROJECT_ROOT="$(dirname "$(dirname "$(readlink -f "${0}")")")"
+#SRC="$(PROJECT_ROOT)/src"
+# TODO fixme
+SRC="$(pwd)/src"
 
 function usage() {
     echo -n \
-         "Usage: $(basename "$0") (--cpu|--gpu)
-Run raster-vision docker image either locally or on an AWS GPU-enabled
-EC2 instance. All arguments except the first are passed to 'docker run'.
+         "Usage: $(basename "$0")
+Run raster-vision CPU image locally.
+All arguments except the first are passed to 'docker run'.
 "
 }
 
 if [ "${BASH_SOURCE[0]}" = "${0}" ]
 then
-    if [ "${1:-}" = "--cpu" ]
-    then
-        docker run --rm -it \
-            -e "AWS_PROFILE=$AWS_PROFILE" \
-            -v "$HOME/.aws":/root/.aws \
-            -p 6006:6006 \
-            -v "$SRC":/opt/src \
-            -v /opt/data:/opt/data \
-            raster-vision-cpu "${@:2}"
+    docker run --rm -it \
+        -e "AWS_PROFILE=$AWS_PROFILE" \
+        -v "$HOME/.aws":/root/.aws \
+        -p 6006:6006 \
+        -v "$SRC":/opt/src \
+        -v ${RASTER_VISION_DATA_DIR}:/opt/data \
+        raster-vision-cpu "${@:2}"
     else
         usage
     fi
